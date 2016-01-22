@@ -1,5 +1,6 @@
 package app.aghaiand.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -30,6 +32,9 @@ public class MainActivityFragment extends Fragment {
 
     public View rootView;
     public static String[] moviePosters;
+    ImageListAdapter adapter;
+
+
 
     public MainActivityFragment() {
     }
@@ -41,6 +46,19 @@ public class MainActivityFragment extends Fragment {
     {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         updatePosters();
+        GridView gv = (GridView) rootView.findViewById(R.id.listview_movies);
+        gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
+
         return rootView;
 
     }
@@ -147,10 +165,9 @@ public class MainActivityFragment extends Fragment {
             super.onPostExecute(strings);
 
             if (strings != null) {
-                ImageListAdapter adapter = new ImageListAdapter(getActivity(),strings);
+                adapter = new ImageListAdapter(getActivity(),strings);
                 GridView lv = (GridView) rootView.findViewById(R.id.listview_movies);
                 lv.setAdapter(adapter);
-
             }
             else
             {
