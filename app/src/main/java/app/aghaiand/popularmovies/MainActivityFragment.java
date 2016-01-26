@@ -49,18 +49,15 @@ public class MainActivityFragment extends Fragment {
         GridView gv = (GridView) rootView.findViewById(R.id.listview_movies);
         gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
 
+                Log.d("MainActivityFragment","Position of View: " + i + "\tRow ID of Item Clicked: " + l);
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
                 startActivity(intent);
             }
         });
-
-
-
-
         return rootView;
-
     }
 
     private void updatePosters()
