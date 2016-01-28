@@ -30,11 +30,9 @@ import java.util.ArrayList;
 public class MainActivityFragment extends Fragment {
 
 
-    public View rootView;
-    public static String[] moviePosters;
-    ImageListAdapter adapter;
-
-
+    private View rootView;
+    private ImageListAdapter adapter;
+    private String[] movieIDs;
 
     public MainActivityFragment() {
     }
@@ -62,12 +60,21 @@ public class MainActivityFragment extends Fragment {
 
     private void updatePosters()
     {
-        FetchMovieData myTask = new FetchMovieData();
+        FetchMoviePoster myTask = new FetchMoviePoster();
         myTask.execute();
     }
 
-    public class FetchMovieData extends AsyncTask<Void, Void, String[]> {
 
+
+   /*
+   ===================================================================================
+    CLASS NAME: FetchMoviePoster
+    CLASS PURPOSE: Extract Movie Poster URL's as well as Movie ID's for future calls.
+    Movie ID's are set in a global variable known as MovieID's
+   ===================================================================================
+     */
+
+    public class FetchMoviePoster extends AsyncTask<Void, Void, String[]> {
 
 
         @Override
@@ -94,12 +101,10 @@ public class MainActivityFragment extends Fragment {
             String movieJSONstr = null;
 
             try {
-                // Construct the URL for the OpenWeatherMap query
-                // Possible parameters are available at OWM's forecast API page, at
-                // http://openweathermap.org/API#forecast
+                // Construct the URL for the MovieDB query
                 URL url = new URL(myBuilder.toString());
                 Log.d("FetchMovieData","URL is " + url);
-                // Create the request to OpenWeatherMap, and open the connection
+                // Create the request to MovieDB, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -130,7 +135,7 @@ public class MainActivityFragment extends Fragment {
 
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attempting
+                // If the code didn't successfully get the movie data, there's no point in attempting
                 // to parse it.
                 movieJSONstr = null;
             } finally {
@@ -171,70 +176,52 @@ public class MainActivityFragment extends Fragment {
                 Log.d("onPostExecute","Strings are NULL!!!");
             }
         }
-//
-//        /* The date/time conversion code is going to be moved outside the asynctask later,
-//                 * so for convenience we're breaking it out into its own method now.
-//                */
-//        private String getReadableDateString(long time) {
-//            // Because the API returns a unix timestamp (measured in seconds),
-//            // it must be converted to milliseconds in order to be converted to valid date.
-//            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
-//            return shortenedDateFormat.format(time);
-//        }
-//
-//        /**
-//         * Prepare the weather high/lows for presentation.
-//         */
-//        private String formatHighLows(double high, double low) {
-//            // For presentation, assume the user doesn't care about tenths of a degree.
-//            long roundedHigh = Math.round(high);
-//            long roundedLow = Math.round(low);
-//            String highLowStr = "";
-//
-//            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//            String units = preferences.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_default));
-//            Log.d("ForecastFragment", "Value for Units is " + units);
-//
-//            if (units.equals("metric")) {
-//                highLowStr = roundedHigh + "/" + roundedLow;
-//            } else if (units.equals("imperial")) {
-//                roundedHigh = (roundedHigh * 9 / 5) + 32;
-//                roundedLow = (roundedLow * 9 / 5) + 32;
-//                highLowStr = roundedHigh + "/" + roundedLow;
-//            }
-//
-//            return highLowStr;
-//        }
 
-        /**
-         * Take the String representing the complete forecast in JSON Format and
-         * pull out the data we need to construct the Strings needed for the wireframes.
-         * <p>
-         * Fortunately parsing is easy:  constructor takes the JSON string and converts it
-         * into an Object hierarchy for us.
-         */
         private String[] getMovieDataFromJSON(String movieJSONstr)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
             final String RESULTS = "results";
             final String POSTER_PATH = "poster_path";
+            final String ID_PATH = "id";
+
 
             JSONObject movieJSON = new JSONObject(movieJSONstr);
             JSONArray movieArray = movieJSON.getJSONArray(RESULTS);
 
             ArrayList<String> movies = new ArrayList<String>();
+            ArrayList<String> movieID = new ArrayList<String>();
+
 
             for (int i = 0; i < movieArray.length(); i++) {
 
                 // Get the JSON object representing the relative path
                 JSONObject relativePath = movieArray.getJSONObject(i);
+                // Get the JSON object representing the movie ID
+                JSONObject ID = movieArray.getJSONObject(i);
 
+                //Get the Movie ID for each movie
+                movieID.add(ID.getString(ID_PATH));
+                Log.d("getMovieData","ID found:\t" + movieID.get(i));
 
                 //Get the Relative Path
                 movies.add(relativePath.getString(POSTER_PATH));
 
             }
+            //Store results of movie ID's in global String array for future use
+            movieIDs = movieID.toArray(new String[movieID.size()]);
+            if(movieIDs == null)
+            {
+                Log.d("MainActivitiyFragment","String transfer did not work!");
+            }
+            else
+            {
+                for(int i = 0; i < movieIDs.length;i++)
+                {
+                    Log.d("MainActivitiyFragment","ID Transferred:\t" + movieIDs[i]);
+                }
+            }
+            //Call the formatURL function to create completed URL's
             return formatURL(movies);
 
         }
@@ -258,4 +245,18 @@ public class MainActivityFragment extends Fragment {
             return movies;
         }
     }
+
+
+   /*
+   ===================================================================================
+    CLASS NAME: FetchMovieData
+    CLASS PURPOSE: Extract information regarding a single MovieID upon selection of a
+    poster in the MainActivity Fragment
+   ===================================================================================
+     */
+
+
+
+
+
 }
