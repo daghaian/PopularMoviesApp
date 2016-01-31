@@ -27,7 +27,8 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment
+{
 
 
     private View rootView;
@@ -51,6 +52,8 @@ public class MainActivityFragment extends Fragment {
             {
 
                 Log.d("MainActivityFragment","Position of View: " + i + "\tRow ID of Item Clicked: " + l);
+                FetchMovieData movieRequested = new FetchMovieData();
+                movieRequested.execute(movieIDs[i]);
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
                 startActivity(intent);
             }
@@ -63,7 +66,6 @@ public class MainActivityFragment extends Fragment {
         FetchMoviePoster myTask = new FetchMoviePoster();
         myTask.execute();
     }
-
 
 
    /*
@@ -234,7 +236,6 @@ public class MainActivityFragment extends Fragment {
             {
                 movies[i] = "http://image.tmdb.org/t/p/w185//" + movieURLs.get(i).substring(1);
                 Log.d("FormatURL","Formatted URL is " + movies[i]);
-
             }
 
             for (int i = 0; i < movies.length; i++)
@@ -246,7 +247,6 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-
    /*
    ===================================================================================
     CLASS NAME: FetchMovieData
@@ -254,6 +254,139 @@ public class MainActivityFragment extends Fragment {
     poster in the MainActivity Fragment
    ===================================================================================
      */
+
+    public class FetchMovieData extends AsyncTask<String, Void, Movie>
+    {
+
+
+        @Override
+        protected Movie doInBackground(String... params)
+        {
+            final String SCHEME = "http";
+            final String AUTHORITY = "api.themoviedb.org";
+            final String PATH = "3/movie";
+            final String API_KEY_QUERY = "api_key";
+
+            Uri.Builder myBuilder = new Uri.Builder();
+            myBuilder.scheme(SCHEME);
+            myBuilder.authority(AUTHORITY);
+            myBuilder.path(PATH);
+            myBuilder.appendPath(params[0]);
+            myBuilder.appendQueryParameter(API_KEY_QUERY, "14cb79ed3293203b59845c42a0c3b309");
+            myBuilder.build();
+            // These two need to be declared outside the try/catch
+            // so that they can be closed in the finally block.
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Will contain the raw JSON response as a string.
+            String movieDataJSONStr = null;
+
+            try {
+                // Construct the URL for the MovieDB query
+                URL url = new URL(myBuilder.toString());
+                Log.d("FetchMovieData","URL is " + url);
+                // Create the request to MovieDB, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    // Nothing to do.
+                    movieDataJSONStr = null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty.  No point in parsing.
+                    movieDataJSONStr = null;
+                }
+                movieDataJSONStr = buffer.toString();
+
+            } catch (IOException e) {
+                Log.e("PlaceholderFragment", "Error ", e);
+                // If the code didn't successfully get the movie data, there's no point in attempting
+                // to parse it.
+                movieDataJSONStr = null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e("PlaceholderFragment", "Error closing stream", e);
+                    }
+                }
+            }
+            try {
+                Log.d("GetMovieData","JSON Object is " + movieDataJSONStr);
+                return getMovieDataFromJSON(movieDataJSONStr);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        //Keep in the mind that onPostExecute is what method is run in order to merge the
+        //background thread back to the Main UI thread
+
+        @Override
+        protected void onPostExecute(Movie myMovie) {
+            super.onPostExecute(myMovie);
+//
+//            if (strings != null) {
+//                adapter = new ImageListAdapter(getActivity(),strings);
+//                GridView lv = (GridView) rootView.findViewById(R.id.listview_movies);
+//                lv.setAdapter(adapter);
+//            }
+//            else
+//            {
+//                Log.d("onPostExecute","Strings are NULL!!!");
+//            }
+        }
+
+        private Movie getMovieDataFromJSON(String movieJSONstr)
+                throws JSONException
+        {
+
+            // These are the names of the JSON objects that need to be extracted.
+            final String TITLE_ATTRIBUTE = "title";
+            final String VOTE_ATTRIBUTE = "vote_average";
+            final String OVERVIEW_ATTRIBUTE = "overview";
+            final String DATE_ATTRIBUTE = "release_date";
+
+            JSONObject movieJSON = new JSONObject(movieJSONstr);
+
+            // Get the JSON object representing the relative path
+            String title = movieJSON.getString(TITLE_ATTRIBUTE);
+            String vote = movieJSON.getString(VOTE_ATTRIBUTE);
+            String overview = movieJSON.getString(OVERVIEW_ATTRIBUTE);
+            String releaseDate = movieJSON.getString(DATE_ATTRIBUTE);
+
+            Movie myMovie = new Movie(title,vote,overview,releaseDate);
+            Log.d("getMovieDataFromJSON","Object of Type \"Movie\" has been created with the following properties:\n");
+            Log.d("getMovieDataFromJSON","Title:" + title + "\n");
+            Log.d("getMovieDataFromJSON","Vote:" + vote + "/10\n");
+            Log.d("getMovieDataFromJSON","Overview:" + overview + "\n");
+            Log.d("getMovieDataFromJSON","Release Date:" + releaseDate + "\n");
+            return myMovie;
+
+        }
+    }
 
 
 
