@@ -27,7 +27,7 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment
+public class MainActivityFragment extends Fragment implements TaskCompleted
 {
 
 
@@ -51,12 +51,13 @@ public class MainActivityFragment extends Fragment
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
             {
 
-                Log.d("MainActivityFragment","Position of View: " + i + "\tRow ID of Item Clicked: " + l);
+                Log.d("MainActivityFragment", "Position of View: " + i + "\tRow ID of Item Clicked: " + l);
                 FetchMovieData movieRequested = new FetchMovieData();
                 movieRequested.execute(movieIDs[i]);
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-
                 startActivity(intent);
+
+
             }
         });
         return rootView;
@@ -258,6 +259,8 @@ public class MainActivityFragment extends Fragment
 
     public class FetchMovieData extends AsyncTask<String, Void, Movie>
     {
+        private TaskCompleted mCallback = (TaskCompleted) getActivity();
+
         @Override
         protected Movie doInBackground(String... params)
         {
@@ -344,18 +347,13 @@ public class MainActivityFragment extends Fragment
         //background thread back to the Main UI thread
 
         @Override
-        protected void onPostExecute(Movie myMovie) {
+        protected void onPostExecute(Movie myMovie)
+        {
             super.onPostExecute(myMovie);
-//
-//            if (strings != null) {
-//                adapter = new ImageListAdapter(getActivity(),strings);
-//                GridView lv = (GridView) rootView.findViewById(R.id.listview_movies);
-//                lv.setAdapter(adapter);
-//            }
-//            else
-//            {
-//                Log.d("onPostExecute","Strings are NULL!!!");
-//            }
+            mCallback.onTaskComplete(myMovie);
+
+
+
         }
 
         private Movie getMovieDataFromJSON(String movieJSONstr)
