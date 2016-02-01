@@ -55,6 +55,7 @@ public class MainActivityFragment extends Fragment
                 FetchMovieData movieRequested = new FetchMovieData();
                 movieRequested.execute(movieIDs[i]);
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
+
                 startActivity(intent);
             }
         });
@@ -257,8 +258,6 @@ public class MainActivityFragment extends Fragment
 
     public class FetchMovieData extends AsyncTask<String, Void, Movie>
     {
-
-
         @Override
         protected Movie doInBackground(String... params)
         {
@@ -362,7 +361,6 @@ public class MainActivityFragment extends Fragment
         private Movie getMovieDataFromJSON(String movieJSONstr)
                 throws JSONException
         {
-
             // These are the names of the JSON objects that need to be extracted.
             final String TITLE_ATTRIBUTE = "title";
             final String VOTE_ATTRIBUTE = "vote_average";
@@ -375,7 +373,7 @@ public class MainActivityFragment extends Fragment
             String title = movieJSON.getString(TITLE_ATTRIBUTE);
             String vote = movieJSON.getString(VOTE_ATTRIBUTE);
             String overview = movieJSON.getString(OVERVIEW_ATTRIBUTE);
-            String releaseDate = movieJSON.getString(DATE_ATTRIBUTE);
+            String releaseDate = movieJSON.getString(DATE_ATTRIBUTE).substring(0,4);
 
             Movie myMovie = new Movie(title,vote,overview,releaseDate);
             Log.d("getMovieDataFromJSON","Object of Type \"Movie\" has been created with the following properties:\n");

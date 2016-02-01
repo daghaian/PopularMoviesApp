@@ -1,8 +1,12 @@
 package app.aghaiand.popularmovies;
 
+import org.parceler.Parcel;
+
 /**
  * Created by davidaghaian on 1/31/16.
  */
+
+@Parcel
 public class Movie
 {
     String title;
@@ -28,38 +32,27 @@ public class Movie
     {
         return title;
     }
-
     String getOverview()
     {
         return overview;
     }
-
     String getVote()
     {
         return vote;
     }
-
     String getReleaseDate()
     {
         return releaseDate;
     }
-
     void setTitle(String title)
     {
         this.title = title;
     }
-
     void setOverview(String overview)
     {
         this.overview = overview;
     }
-
-    void setVote(String vote)
-    {
-        this.vote = vote;
-
-    }
-
+    void setVote(String vote) { this.vote = vote; }
     void setReleaseDate(String releaseDate)
     {
         this.releaseDate = releaseDate;
