@@ -9,5 +9,19 @@
     tools:context="app.aghaiand.popularmovies.DetailActivityFragment"
     tools:showIn="@layout/activity_detail">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Chappie"
+        android:id="@+id/textView"
+        android:gravity="center_vertical"
+        android:paddingTop="35dp"
+        android:paddingBottom="35dp"
+        android:paddingLeft="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="#0EAFA5" />
 
 </RelativeLayout>

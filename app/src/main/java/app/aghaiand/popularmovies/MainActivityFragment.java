@@ -1,5 +1,6 @@
 package app.aghaiand.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,6 +16,7 @@ import android.widget.GridView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +29,7 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements TaskCompleted
+public class MainActivityFragment extends Fragment
 {
 
 
@@ -35,7 +37,10 @@ public class MainActivityFragment extends Fragment implements TaskCompleted
     private ImageListAdapter adapter;
     private String[] movieIDs;
 
-    public MainActivityFragment() {
+
+    public MainActivityFragment()
+    {
+
     }
 
     @Override
@@ -45,7 +50,10 @@ public class MainActivityFragment extends Fragment implements TaskCompleted
     {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         updatePosters();
+
         GridView gv = (GridView) rootView.findViewById(R.id.listview_movies);
+        final Context context = getActivity().getParent();
+        Log.d("Context","Context is " + context);
         gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
@@ -54,10 +62,6 @@ public class MainActivityFragment extends Fragment implements TaskCompleted
                 Log.d("MainActivityFragment", "Position of View: " + i + "\tRow ID of Item Clicked: " + l);
                 FetchMovieData movieRequested = new FetchMovieData();
                 movieRequested.execute(movieIDs[i]);
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                startActivity(intent);
-
-
             }
         });
         return rootView;
@@ -259,7 +263,12 @@ public class MainActivityFragment extends Fragment implements TaskCompleted
 
     public class FetchMovieData extends AsyncTask<String, Void, Movie>
     {
-        private TaskCompleted mCallback = (TaskCompleted) getActivity();
+//        public TaskCompleted mCallback;
+//
+//        public FetchMovieData(TaskCompleted mCallback)
+//        {
+//            this.mCallback= mCallback;
+//        }
 
         @Override
         protected Movie doInBackground(String... params)
@@ -350,10 +359,11 @@ public class MainActivityFragment extends Fragment implements TaskCompleted
         protected void onPostExecute(Movie myMovie)
         {
             super.onPostExecute(myMovie);
-            mCallback.onTaskComplete(myMovie);
-
-
-
+            Log.d("onPostExecute", "Title:" + myMovie.getTitle());
+            Intent intent = new Intent(getActivity(), DetailActivity.class);
+            intent.putExtra("movie", Parcels.wrap(myMovie));
+            startActivity(intent);
+//            mCallback.onTaskComplete(myMovie);
         }
 
         private Movie getMovieDataFromJSON(String movieJSONstr)
@@ -380,7 +390,6 @@ public class MainActivityFragment extends Fragment implements TaskCompleted
             Log.d("getMovieDataFromJSON","Overview:" + overview + "\n");
             Log.d("getMovieDataFromJSON","Release Date:" + releaseDate + "\n");
             return myMovie;
-
         }
     }
 
