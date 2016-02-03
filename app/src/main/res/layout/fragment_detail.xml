@@ -10,18 +10,33 @@
     tools:showIn="@layout/activity_detail">
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Chappie"
-        android:id="@+id/textView"
-        android:gravity="center_vertical"
-        android:paddingTop="35dp"
-        android:paddingBottom="35dp"
-        android:paddingLeft="15dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:background="#0EAFA5" />
+        android:layout_alignParentTop="true"
+        android:background="#0EAFA5"
+        android:elevation="10sp"
+        android:gravity="center_vertical"
+        android:textColor="@color/textColor"
+        android:paddingBottom="35dp"
+        android:paddingLeft="20dp"
+        android:paddingTop="40dp"
+        android:text="Chappie"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="40dp"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="29dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="36dp" />
+
 
 </RelativeLayout>
